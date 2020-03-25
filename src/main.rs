@@ -92,7 +92,7 @@ fn get_divisors(num : u32) ->  Vec<Divisor>{
 fn run_single(file_path : &str, file_size : u64, size : PictureInfo){
     let sw = Stopwatch::start_new();
     let mut offset = 0;
-    let mut f = BufReader::new(File::open(file_path).unwrap());
+    let mut f = File::open(file_path).unwrap();
     let mut file_byte = [0; 3];
     let mut imgbuf = image::ImageBuffer::new(size.width, size.height); 
 
@@ -102,20 +102,17 @@ fn run_single(file_path : &str, file_size : u64, size : PictureInfo){
             PictureShape::Square => {
                 f.read(&mut file_byte[..]).unwrap();
                 if offset >= file_size
-                {
-                 
+                {          
                     imgbuf.put_pixel(x, y, image::Rgba([0, 0, 0, 3]));
                     break;
                 }
                 else if offset + 2 == file_size
-                {
-          
+                {        
                     imgbuf.put_pixel(x, y, image::Rgba([file_byte[0], file_byte[1], 0, 2]));
                     break 'outer;
                 }
                 else if offset + 1 == file_size
                 {
-     
                     imgbuf.put_pixel(x, y, image::Rgba([file_byte[0], 0, 0, 1]));
                 }
                 else if file_size <= offset
@@ -123,8 +120,7 @@ fn run_single(file_path : &str, file_size : u64, size : PictureInfo){
                     break 'outer;
                 }
                 else
-                {
-    
+                { 
                     imgbuf.put_pixel(x, y, image::Rgba([file_byte[0], file_byte[1], file_byte[2], 255]));
                 }
                 offset += 3;
