@@ -17,10 +17,7 @@ struct PictureInfo {
     shape: PictureShape,
 }
 
-struct Divisor {
-    A: u32,
-    B: u32,
-}
+type Divisor = (u32, u32);
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -36,35 +33,29 @@ fn main() {
 fn calculate_size(file_size: u64, shape: PictureShape) -> PictureInfo {
     match shape {
         PictureShape::Square => {
-            let mut length = ((file_size / 3) as f64).sqrt();
-
-            if length % 1.0 != 0.0 {
-                length = length.ceil()
-            }
+            let length = ((file_size / 3) as f64).sqrt().ceil() as u32;
 
             PictureInfo {
-                width: length as u32,
-                height: length as u32,
+                width: length,
+                height: length,
                 shape: PictureShape::Square,
             }
         }
         PictureShape::Rectangular => {
-            let mut length = ((file_size / 3) as f64).sqrt();
+            let length = ((file_size / 3) as f64).sqrt() as u32;
 
-            if (length / 3.0) % 1.0 != 0.0 {
-                length = length.ceil()
-            }
-            let divisors = get_divisors(length as u32);
-            for i in 0..divisors.len() {
-                println!("{}: w: {} h:{}", i, divisors[i].A, divisors[i].B);
+            let divisors = get_divisors(length);
+            for (i, divisor) in divisors.iter().enumerate() {
+                println!("{}: w: {} h:{}", i, divisor.0, divisor.1);
             }
 
             let mut input = String::new();
             io::stdin().read_line(&mut input).unwrap();
+            let size = input.trim().parse::<usize>().unwrap();
 
             PictureInfo {
-                width: divisors[input.trim().parse::<usize>().unwrap()].A,
-                height: divisors[input.trim().parse::<usize>().unwrap()].B,
+                width: divisors[size].0,
+                height: divisors[size].1,
                 shape: PictureShape::Rectangular,
             }
         }
@@ -78,9 +69,11 @@ fn calculate_size(file_size: u64, shape: PictureShape) -> PictureInfo {
 
 fn get_divisors(num: u32) -> Vec<Divisor> {
     let mut temp = Vec::new();
-    for i in 1..num {
+    // a * b = num이라면 b * a = num이다.
+    for i in 1..=((num as f32).sqrt() as u32) {
         if num % i == 0 {
-            temp.push(Divisor { A: i, B: num / i });
+            temp.push((i, num / i));
+            temp.push((num / i , i));
         }
     }
     return temp;
