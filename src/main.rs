@@ -1,13 +1,9 @@
 extern crate image;
-extern crate stopwatch;
 
 use std::env;
-use std::fs;
-use std::fs::File;
-use std::io;
-use std::io::BufReader;
-use std::io::Read;
-use stopwatch::Stopwatch;
+use std::fs::{self, File};
+use std::io::{self, Read};
+use std::time::Instant;
 
 enum PictureShape {
     Square,
@@ -91,7 +87,7 @@ fn get_divisors(num: u32) -> Vec<Divisor> {
 }
 
 fn run_single(file_path: &str, file_size: u64, size: PictureInfo) {
-    let sw = Stopwatch::start_new();
+    let start_time = Instant::now();
     let mut offset = 0;
     let mut f = File::open(file_path).unwrap();
     let mut file_byte = [0; 3];
@@ -129,5 +125,5 @@ fn run_single(file_path: &str, file_size: u64, size: PictureInfo) {
 
     println!("PNG 압축시작");
     imgbuf.save("output.png").unwrap();
-    println!("작업완료! {}ms", sw.elapsed_ms());
+    println!("작업완료! {:#?}", start_time.elapsed());
 }
